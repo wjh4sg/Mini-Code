@@ -63,7 +63,7 @@ class CLIAcceptanceTests(unittest.TestCase):
     def test_readme_contains_required_content(self):
         readme = (self.root / "README.md").read_text(encoding="utf-8")
         required = [
-            "MiniCode v0.2.0 是一个可安装的本地 CLI Coding Agent MVP。",
+            "MiniCode v0.2.1 是一个可安装的本地 CLI Coding Agent MVP。",
             "第一版只输出分析、计划和 Patch 建议，不自动修改文件。",
             "项目背景",
             "核心功能",
@@ -150,3 +150,46 @@ class CLIAcceptanceTests(unittest.TestCase):
         spec_text = spec.read_text(encoding="utf-8")
         self.assertIn("# MiniCode MVP SPEC v0.1.1", spec_text)
         self.assertIn("# 37. 最终一句话总结", spec_text)
+
+    def test_v021_display_evidence_is_complete_and_sanitized(self):
+        readme = (self.root / "README.md").read_text(encoding="utf-8")
+        showcase = self.root / "docs" / "cli-showcase.svg"
+        real_example = self.root / "docs" / "real-llm-example.md"
+        version_spec = self.root / "docs" / "spec-v0.2.0.md"
+
+        for relative_path in (
+            "docs/cli-showcase.svg",
+            "docs/real-llm-example.md",
+            "docs/spec-v0.2.0.md",
+        ):
+            self.assertIn(relative_path, readme)
+
+        for path in (showcase, real_example, version_spec):
+            self.assertTrue(path.is_file(), path)
+            self.assertGreater(path.stat().st_size, 100)
+
+        real_text = real_example.read_text(encoding="utf-8")
+        self.assertIn("deepseek-v4-flash", real_text)
+        self.assertIn("帮我给用户模块增加修改昵称接口", real_text)
+        self.assertIn("## 任务理解", real_text)
+        self.assertIn("## 实现步骤", real_text)
+        self.assertNotIn("【模型调用失败】", real_text)
+        self.assertNotIn("Mock 模式示例", real_text)
+
+        version_text = version_spec.read_text(encoding="utf-8")
+        self.assertIn("v0.1.1", version_text)
+        self.assertIn("只读安全边界", version_text)
+
+        combined = "\n".join(
+            (
+                readme,
+                showcase.read_text(encoding="utf-8"),
+                real_text,
+                version_text,
+            )
+        )
+        self.assertNotIn("Authorization: Bearer", combined)
+        self.assertNotIn("C:\\Users\\", combined)
+        api_key = os.environ.get("DASHSCOPE_API_KEY")
+        if api_key:
+            self.assertNotIn(api_key, combined)

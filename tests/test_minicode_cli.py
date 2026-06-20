@@ -19,7 +19,7 @@ class MiniCodeCLITests(unittest.TestCase):
             code = minicode_cli.main(["--version"])
 
         self.assertEqual(code, 0)
-        self.assertEqual(stdout.getvalue().strip(), "MiniCode 0.2.0")
+        self.assertEqual(stdout.getvalue().strip(), "MiniCode 0.2.1")
 
     def test_query_uses_explicit_workspace(self):
         with tempfile.TemporaryDirectory() as temporary:

@@ -5,10 +5,13 @@
 [![Release](https://img.shields.io/github/v/release/wjh4sg/Mini-Code)](https://github.com/wjh4sg/Mini-Code/releases)
 [![License](https://img.shields.io/badge/License-MIT-2ea44f.svg)](LICENSE)
 
-MiniCode v0.2.0 是一个可安装的本地 CLI Coding Agent MVP。
+MiniCode v0.2.1 是一个可安装的本地 CLI Coding Agent MVP。
 第一版只输出分析、计划和 Patch 建议，不自动修改文件。
+v0.2.1 只增强真实效果与 CLI 展示证据，不扩大 Agent 权限。
 
 ![MiniCode 安全访问演示](docs/demo.svg)
+
+![MiniCode CLI 展示](docs/cli-showcase.svg)
 
 > 关键词：确定性 Skill 路由、只读工具调用、路径安全边界、上下文压缩、
 > OpenAI-compatible API、失败降级、可追踪任务记忆。
@@ -94,6 +97,19 @@ minicode doctor
 如果不传 `-w`，workspace 默认为当前目录。`--mock` 会在本次执行中忽略
 真实模型配置，`doctor` 会检查 Python、应用目录、workspace、Skill 配置、
 memory 路径和模型模式。
+
+### Doctor 输出示例
+
+```text
+$ minicode doctor -w examples/sample_project
+MiniCode doctor
+Python: 3.10+
+app_root: <repo>
+workspace: <repo>/examples/sample_project
+skills.json: found
+memory path: <repo>/data/memory.json
+LLM mode: mock
+```
 
 无需安装也可保留源码入口：
 
@@ -216,7 +232,48 @@ Mock 模式示例：请结合上方项目上下文进行判断。
 - .env: 禁止读取敏感文件：.env
 ```
 
-完整产品规格见 [MiniCode MVP SPEC v0.1.1](docs/spec-v0.1.1.md)。
+## 真实模型输出示例
+
+下面内容来自 2026-06-20 对阿里云百炼 `deepseek-v4-flash` 的实际调用，
+任务为“帮我给用户模块增加修改昵称接口”。调用使用现有
+OpenAI-compatible 客户端，API Key 仅从环境变量读取。
+
+```text
+【任务类型】
+small_feature_plan
+
+【执行过程】
+- search_code("user") success
+- search_code("nickname") success
+- read_file("app/user_router.py") success
+- read_file("app/user_service.py") success
+- read_file("app/user_schema.py") success
+- read_file("tests/test_user.py") success
+
+【分析结果】
+## 任务理解
+- 目标是在现有用户模块增加修改昵称的 HTTP 接口。
+- 当前服务层返回固定用户，需要增加请求模型、PATCH 路由和临时状态存储。
+
+## 实现步骤
+1. 添加包含 nickname 字段的 UpdateNicknameRequest。
+2. 为 UserService 增加内存用户存储和 update_nickname 方法。
+3. 添加 PATCH /user/{user_id}/nickname 路由。
+4. 增加修改成功、再次查询和错误路径测试。
+
+【风险检查】
+检测到被拒绝的访问：
+- .env: 禁止读取敏感文件：.env
+```
+
+完整脱敏记录见 [Real LLM 输出示例](docs/real-llm-example.md)。该输出证明
+真实模型能基于工具读取到的项目上下文给出文件级计划；Mock 仍用于 CI 和
+稳定演示。
+
+规格文档：
+
+- [MiniCode MVP SPEC v0.1.1](docs/spec-v0.1.1.md)：Agent 核心与安全边界；
+- [MiniCode SPEC v0.2.0](docs/spec-v0.2.0.md)：可安装 CLI 增量规格。
 
 ## 模块职责
 
@@ -297,7 +354,7 @@ python -m unittest discover -v
 
 ## 第一版边界
 
-MiniCode v0.2.0 不自动修改或删除文件，不执行 shell，不运行目标项目测试，
+MiniCode v0.2.1 不自动修改或删除文件，不执行 shell，不运行目标项目测试，
 不进行 Git commit/push，不提供 Web UI、IDE 插件、MCP、多 Agent、向量库、
 Tree-sitter 或自动修复闭环。
 

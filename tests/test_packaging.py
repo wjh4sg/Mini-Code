@@ -10,7 +10,7 @@ class PackagingTests(unittest.TestCase):
         pyproject = (REPOSITORY_ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
         self.assertIn('name = "minicode-agent"', pyproject)
-        self.assertIn('version = "0.2.0"', pyproject)
+        self.assertIn('version = "0.2.1"', pyproject)
         self.assertIn('requires-python = ">=3.10"', pyproject)
         self.assertIn('minicode = "minicode_cli:main"', pyproject)
 
