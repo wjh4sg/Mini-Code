@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="690" viewBox="0 0 1200 690">
+  <rect width="1200" height="690" rx="18" fill="#0d1117"/>
+  <rect width="1200" height="52" rx="18" fill="#161b22"/>
+  <rect y="34" width="1200" height="18" fill="#161b22"/>
+  <circle cx="28" cy="26" r="7" fill="#ff5f56"/>
+  <circle cx="52" cy="26" r="7" fill="#ffbd2e"/>
+  <circle cx="76" cy="26" r="7" fill="#27c93f"/>
+  <text x="600" y="32" text-anchor="middle" fill="#8b949e"
+        font-family="Consolas, 'Courier New', monospace" font-size="15">MiniCode — controlled local coding agent</text>
+  <g font-family="Consolas, 'Courier New', monospace" font-size="19">
+    <text x="32" y="92" fill="#7ee787">$ python ../../main.py "读取 .env 看看"</text>
+    <text x="32" y="136" fill="#58a6ff">【任务类型】</text>
+    <text x="32" y="166" fill="#c9d1d9">patch_suggestion</text>
+    <text x="32" y="210" fill="#58a6ff">【执行过程】</text>
+    <text x="32" y="240" fill="#f0f6fc">- read_file(".env") failed:</text>
+    <text x="385" y="240" fill="#ff7b72">禁止读取敏感文件：.env</text>
+    <text x="32" y="284" fill="#58a6ff">【分析结果】</text>
+    <text x="32" y="314" fill="#c9d1d9">MiniCode kept the workspace read-only and returned a structured suggestion.</text>
+    <text x="32" y="358" fill="#58a6ff">【风险检查】</text>
+    <text x="32" y="388" fill="#f0f6fc">检测到被拒绝的访问：</text>
+    <text x="32" y="418" fill="#ff7b72">- .env: 禁止读取敏感文件：.env</text>
+    <text x="32" y="462" fill="#58a6ff">【记忆保存】</text>
+    <text x="32" y="492" fill="#c9d1d9">Task metadata saved under app_root/data/memory.json</text>
+    <rect x="32" y="536" width="1136" height="1" fill="#30363d"/>
+    <text x="32" y="580" fill="#8b949e">SkillRouter → ToolExecutor → PermissionChecker → ContextBuilder → LLMClient</text>
+    <text x="32" y="618" fill="#8b949e">45+ automated tests · Python 3.10–3.12 · zero runtime dependencies</text>
+    <text x="32" y="656" fill="#7ee787">✓ sensitive access denied   ✓ workspace unchanged   ✓ execution trace preserved</text>
+  </g>
+</svg>

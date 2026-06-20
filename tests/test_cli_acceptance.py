@@ -100,3 +100,24 @@ class CLIAcceptanceTests(unittest.TestCase):
         self.assertEqual(tracked.stdout.strip(), "")
         example = self.root / "data" / "memory.example.json"
         self.assertEqual(example.read_text(encoding="utf-8").strip(), "[]")
+
+    def test_repository_presentation_assets_are_complete(self):
+        readme = (self.root / "README.md").read_text(encoding="utf-8")
+        workflow = self.root / ".github" / "workflows" / "tests.yml"
+        demo = self.root / "docs" / "demo.svg"
+        license_path = self.root / "LICENSE"
+
+        self.assertNotIn("<repository-url>", readme)
+        self.assertIn("https://github.com/wjh4sg/Mini-Code.git", readme)
+        self.assertIn("actions/workflows/tests.yml/badge.svg", readme)
+        self.assertIn("docs/demo.svg", readme)
+        self.assertIn("面试讲解要点", readme)
+        self.assertTrue(workflow.is_file())
+        workflow_text = workflow.read_text(encoding="utf-8")
+        for version in ("3.10", "3.11", "3.12"):
+            self.assertIn(version, workflow_text)
+        self.assertIn("python -m compileall -q .", workflow_text)
+        self.assertIn("python -m unittest discover -v", workflow_text)
+        self.assertTrue(demo.is_file())
+        self.assertIn("MiniCode", demo.read_text(encoding="utf-8"))
+        self.assertTrue(license_path.is_file())
