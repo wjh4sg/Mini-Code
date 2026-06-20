@@ -234,6 +234,11 @@ class QueryLoop:
 
     def _detect_sensitive_file_request(self, text):
         lowered = text.lower()
+        candidates = re.findall(r"[A-Za-z0-9_./\\-]+", text)
+        for candidate in candidates:
+            candidate_lower = candidate.lower()
+            if any(term in candidate_lower for term in self.SENSITIVE_TERMS):
+                return candidate
         for term in self.SENSITIVE_TERMS:
             if term in lowered:
                 return term

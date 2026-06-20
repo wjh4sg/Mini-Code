@@ -54,3 +54,7 @@ class LoopHelperTests(unittest.TestCase):
 
     def test_detects_sensitive_request(self):
         self.assertEqual(self.loop._detect_sensitive_file_request("读取 .env 看看"), ".env")
+        self.assertEqual(
+            self.loop._detect_sensitive_file_request("读取 config.secret.json 看看"),
+            "config.secret.json",
+        )

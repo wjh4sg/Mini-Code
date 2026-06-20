@@ -75,7 +75,17 @@ def search_code(
                     if len(matches) >= max_results:
                         return
 
-    walk(workspace)
+    try:
+        walk(workspace)
+    except OSError as error:
+        return {
+            "tool": "search_code",
+            "success": False,
+            "keyword": keyword,
+            "matches": matches,
+            "rejected_files": rejected_files,
+            "reason": f"代码搜索失败：{error}",
+        }
     return {
         "tool": "search_code",
         "success": True,

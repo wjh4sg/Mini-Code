@@ -61,6 +61,7 @@ class SkillRouterTests(unittest.TestCase):
             r"帮我修改 src\config.py": "patch_suggestion",
             "给出 patch": "patch_suggestion",
             "读取 .env 看看": "patch_suggestion",
+            "登录 token 报错": "fix_error",
             "hello": "unknown",
         }
 

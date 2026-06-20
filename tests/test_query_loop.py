@@ -115,6 +115,9 @@ class QueryLoopTests(unittest.TestCase):
         self.assertIn("禁止读取敏感文件", output)
         self.assertIn(".env", output)
 
+        named_output = self.make_loop().run("读取 config.secret.json 看看")
+        self.assertIn('read_file("config.secret.json") failed', named_output)
+
     def test_unknown_uses_no_tools_but_saves_memory(self):
         output = self.make_loop().run("hello")
 

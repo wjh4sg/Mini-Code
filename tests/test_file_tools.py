@@ -1,6 +1,8 @@
+import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from safety.permission_checker import PermissionChecker
 from tools.file_tools import list_files, read_file
@@ -78,3 +80,32 @@ class FileToolsTests(unittest.TestCase):
 
         self.assertTrue(result["success"])
         self.assertEqual(result["content"], "helloworld")
+
+    def test_list_files_does_not_follow_directory_symlink_outside_workspace(self):
+        outside = self.workspace.parent / f"{self.workspace.name}-outside"
+        outside.mkdir(exist_ok=True)
+        (outside / "secret.txt").write_text("outside", encoding="utf-8")
+        link = self.workspace / "external"
+        try:
+            os.symlink(outside, link, target_is_directory=True)
+        except (OSError, NotImplementedError):
+            self.skipTest("directory symlinks are unavailable in this environment")
+        try:
+            result = list_files(self.workspace, ".", max_depth=3)
+            self.assertFalse(any("secret.txt" in path for path in result["result"]))
+        finally:
+            if link.exists():
+                link.unlink()
+            (outside / "secret.txt").unlink()
+            outside.rmdir()
+
+    def test_filesystem_errors_return_structured_failures(self):
+        with patch("pathlib.Path.iterdir", side_effect=OSError("denied")):
+            listed = list_files(self.workspace)
+        self.assertFalse(listed["success"])
+        self.assertIn("denied", listed["reason"])
+
+        with patch("pathlib.Path.read_text", side_effect=OSError("denied")):
+            read = read_file(self.workspace, "README.md", self.checker)
+        self.assertFalse(read["success"])
+        self.assertIn("denied", read["reason"])

@@ -20,6 +20,7 @@ class SkillRouter:
         "api_key",
         "access_key",
     )
+    ACCESS_TERMS = ("读取", "查看", "打开", "看看", "read", "cat", "show")
     PATCH_TERMS = ("patch", "diff", "改这个文件", "修这个函数", "给出 patch")
     ERROR_TERMS = (
         "报错",
@@ -77,7 +78,10 @@ class SkillRouter:
 
     def route(self, query):
         lowered = query.lower()
-        if any(term in lowered for term in self.SENSITIVE_REQUEST_TERMS):
+        if (
+            any(term in lowered for term in self.ACCESS_TERMS)
+            and any(term in lowered for term in self.SENSITIVE_REQUEST_TERMS)
+        ):
             return self._matched("patch_suggestion", "检测到敏感文件访问请求")
         if (
             any(term in lowered for term in self.PATCH_TERMS)

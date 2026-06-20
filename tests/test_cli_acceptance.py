@@ -9,10 +9,15 @@ class CLIAcceptanceTests(unittest.TestCase):
     def setUp(self):
         self.root = Path(__file__).resolve().parents[1]
         self.workspace = self.root / "examples" / "sample_project"
+        self.memory_path = self.root / "data" / "memory.json"
+        self.original_memory = self.memory_path.read_bytes()
         self.env = os.environ.copy()
         self.env["PYTHONIOENCODING"] = "utf-8"
         for name in ("MINICODE_API_KEY", "MINICODE_BASE_URL", "MINICODE_MODEL"):
             self.env.pop(name, None)
+
+    def tearDown(self):
+        self.memory_path.write_bytes(self.original_memory)
 
     def run_cli(self, query):
         return subprocess.run(

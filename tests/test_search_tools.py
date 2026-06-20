@@ -1,6 +1,7 @@
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from safety.permission_checker import PermissionChecker
 from tools.search_tools import search_code
@@ -59,3 +60,10 @@ class SearchToolsTests(unittest.TestCase):
 
         self.assertFalse(result["success"])
         self.assertIn("不能为空", result["reason"])
+
+    def test_filesystem_error_returns_structured_failure(self):
+        with patch("pathlib.Path.iterdir", side_effect=OSError("denied")):
+            result = search_code(self.workspace, "user", self.checker)
+
+        self.assertFalse(result["success"])
+        self.assertIn("denied", result["reason"])

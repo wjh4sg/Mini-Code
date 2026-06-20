@@ -80,6 +80,10 @@ def list_files(workspace, path=".", max_depth=2, max_items=200):
             if child.is_dir() and child.name in IGNORED_DIRS:
                 continue
             try:
+                child.resolve().relative_to(workspace)
+            except ValueError:
+                continue
+            try:
                 relative = child.relative_to(workspace).as_posix()
             except ValueError:
                 continue
@@ -90,7 +94,15 @@ def list_files(workspace, path=".", max_depth=2, max_items=200):
             else:
                 results.append(relative)
 
-    visit(root, 0)
+    try:
+        visit(root, 0)
+    except OSError as error:
+        return {
+            "tool": "list_files",
+            "success": False,
+            "path": str(path),
+            "reason": f"目录扫描失败：{error}",
+        }
     return {
         "tool": "list_files",
         "success": True,
@@ -124,36 +136,43 @@ def read_file(
             "path": str(path),
             "reason": "禁止访问项目目录外路径",
         }
-    if not target.exists():
+    try:
+        if not target.exists():
+            return {
+                "tool": "read_file",
+                "success": False,
+                "path": str(path),
+                "reason": "文件不存在",
+            }
+        if not target.is_file():
+            return {
+                "tool": "read_file",
+                "success": False,
+                "path": str(path),
+                "reason": "路径不是文件",
+            }
+        if target.suffix.lower() not in TEXT_SUFFIXES:
+            return {
+                "tool": "read_file",
+                "success": False,
+                "path": str(path),
+                "reason": "不支持的文本文件类型",
+            }
+        if target.stat().st_size > max_file_size:
+            return {
+                "tool": "read_file",
+                "success": False,
+                "path": str(path),
+                "reason": "文件过大，超过 1MB，跳过读取",
+            }
+        text = target.read_text(encoding="utf-8", errors="ignore")
+    except OSError as error:
         return {
             "tool": "read_file",
             "success": False,
             "path": str(path),
-            "reason": "文件不存在",
+            "reason": f"文件读取失败：{error}",
         }
-    if not target.is_file():
-        return {
-            "tool": "read_file",
-            "success": False,
-            "path": str(path),
-            "reason": "路径不是文件",
-        }
-    if target.suffix.lower() not in TEXT_SUFFIXES:
-        return {
-            "tool": "read_file",
-            "success": False,
-            "path": str(path),
-            "reason": "不支持的文本文件类型",
-        }
-    if target.stat().st_size > max_file_size:
-        return {
-            "tool": "read_file",
-            "success": False,
-            "path": str(path),
-            "reason": "文件过大，超过 1MB，跳过读取",
-        }
-
-    text = target.read_text(encoding="utf-8", errors="ignore")
     lines = text.splitlines()
     selected = lines[:max_lines]
     return {
