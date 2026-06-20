@@ -32,6 +32,8 @@ MiniCode v0.1.1 是一个本地 CLI Coding Agent MVP。
 
 ## 核心执行流程
 
+![MiniCode 架构图](docs/architecture.svg)
+
 ```mermaid
 flowchart LR
     A[用户任务] --> B[SkillRouter]
@@ -96,6 +98,106 @@ python ../../main.py "读取 .env 看看"
 ```
 
 最后一条命令会尝试读取演示 `.env`，随后由 `PermissionChecker` 明确拒绝。
+
+## Demo 输出示例
+
+下面内容来自当前 `examples/sample_project` 的 Mock 模式实际运行结果。
+为避免绑定开发机路径，memory 路径统一写成 `<app_root>/data/memory.json`。
+
+### Demo 1：项目分析
+
+```text
+【任务类型】
+explain_project
+
+【执行过程】
+- list_files(".") success
+- read_file("README.md") success
+- read_file("requirements.txt") success
+
+【分析结果】
+【项目用途】
+Mock 模式示例：请结合上方项目上下文进行判断。
+【技术栈】
+Mock 模式示例：请结合上方项目上下文进行判断。
+【目录结构】
+Mock 模式示例：请结合上方项目上下文进行判断。
+
+【风险检查】
+未发现敏感文件读取行为。
+```
+
+### Demo 2：小功能计划
+
+```text
+【任务类型】
+small_feature_plan
+
+【执行过程】
+- search_code("user") success
+- search_code("nickname") success
+- read_file("app/user_router.py") success
+- read_file("app/user_service.py") success
+- read_file("app/user_schema.py") success
+- read_file("tests/test_user.py") success
+
+【分析结果】
+【任务理解】
+Mock 模式示例：请结合上方项目上下文进行判断。
+【可能涉及文件】
+Mock 模式示例：请结合上方项目上下文进行判断。
+【实现步骤】
+Mock 模式示例：请结合上方项目上下文进行判断。
+
+【风险检查】
+检测到被拒绝的访问：
+- .env: 禁止读取敏感文件：.env
+```
+
+这里的 `.env` 风险记录来自 `search_code` 扫描候选文件时主动跳过敏感
+文件，说明搜索工具不能绕过权限审查。
+
+### Demo 3：报错分析
+
+```text
+【任务类型】
+fix_error
+
+【执行过程】
+- search_code("ModuleNotFoundError") success
+- read_file("requirements.txt") success
+
+【分析结果】
+【错误类型】
+Mock 模式示例：请结合上方项目上下文进行判断。
+【可能原因】
+Mock 模式示例：请结合上方项目上下文进行判断。
+【修复建议】
+Mock 模式示例：请结合上方项目上下文进行判断。
+
+【记忆保存】
+任务执行完成后将保存到 <app_root>/data/memory.json
+```
+
+### Demo 4：权限拒绝
+
+```text
+【任务类型】
+patch_suggestion
+
+【执行过程】
+- read_file(".env") failed: 禁止读取敏感文件：.env
+
+【分析结果】
+【Patch 建议】
+Mock 模式示例：请结合上方项目上下文进行判断。
+
+【风险检查】
+检测到被拒绝的访问：
+- .env: 禁止读取敏感文件：.env
+```
+
+完整产品规格见 [MiniCode MVP SPEC v0.1.1](docs/spec-v0.1.1.md)。
 
 ## 模块职责
 
