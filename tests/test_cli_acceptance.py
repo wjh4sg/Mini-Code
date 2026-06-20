@@ -63,7 +63,7 @@ class CLIAcceptanceTests(unittest.TestCase):
     def test_readme_contains_required_content(self):
         readme = (self.root / "README.md").read_text(encoding="utf-8")
         required = [
-            "MiniCode v0.1.1 是一个本地 CLI Coding Agent MVP。",
+            "MiniCode v0.2.0 是一个可安装的本地 CLI Coding Agent MVP。",
             "第一版只输出分析、计划和 Patch 建议，不自动修改文件。",
             "项目背景",
             "核心功能",

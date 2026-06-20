@@ -5,7 +5,7 @@
 [![Release](https://img.shields.io/github/v/release/wjh4sg/Mini-Code)](https://github.com/wjh4sg/Mini-Code/releases)
 [![License](https://img.shields.io/badge/License-MIT-2ea44f.svg)](LICENSE)
 
-MiniCode v0.1.1 是一个本地 CLI Coding Agent MVP。
+MiniCode v0.2.0 是一个可安装的本地 CLI Coding Agent MVP。
 第一版只输出分析、计划和 Patch 建议，不自动修改文件。
 
 ![MiniCode 安全访问演示](docs/demo.svg)
@@ -49,7 +49,9 @@ flowchart LR
 ## 目录结构
 
 ```text
-main.py
+pyproject.toml
+minicode_cli.py  参数化 CLI 与 doctor
+main.py          源码运行兼容入口
 agent/       调度、路由、Prompt、模型和输出
 tools/       文件扫描、读取和代码搜索
 safety/      路径边界与敏感文件检查
@@ -62,23 +64,42 @@ tests/       unittest 测试
 
 ## 安装
 
-运行环境为 Python 3.10+。MiniCode 自身只使用标准库，无需安装依赖：
+运行环境为 Python 3.10+。MiniCode 自身只使用标准库；克隆后以 editable
+模式安装，即可在任意目录使用 `minicode` 命令：
 
 ```bash
 git clone https://github.com/wjh4sg/Mini-Code.git
 cd Mini-Code
-python --version
+python -m pip install --upgrade pip
+python -m pip install -e .
+minicode --version
 ```
+
+editable install 需要支持 PEP 660 的较新 pip，因此先执行升级步骤。
 
 `examples/sample_project/requirements.txt` 只描述示例 FastAPI 项目，
 运行 MiniCode 测试不需要安装它。
 
 ## 快速开始
 
-在你希望分析的项目根目录运行 MiniCode 的 `main.py`：
+推荐使用安装后的命令，并用 `-w/--workspace` 指定要分析的项目：
 
 ```bash
-python /path/to/minicode/main.py "帮我分析这个项目"
+minicode -w examples/sample_project "帮我分析这个项目"
+minicode --debug -w examples/sample_project "帮我分析这个项目"
+minicode --mock -w examples/sample_project "帮我分析这个项目"
+minicode doctor
+```
+
+如果不传 `-w`，workspace 默认为当前目录。`--mock` 会在本次执行中忽略
+真实模型配置，`doctor` 会检查 Python、应用目录、workspace、Skill 配置、
+memory 路径和模型模式。
+
+无需安装也可保留源码入口：
+
+```bash
+python main.py "帮我分析这个项目"
+python main.py -w examples/sample_project "帮我分析这个项目"
 ```
 
 MiniCode 区分两个路径：
@@ -89,12 +110,10 @@ MiniCode 区分两个路径：
 ## Demo
 
 ```bash
-cd examples/sample_project
-
-python ../../main.py "帮我分析这个项目"
-python ../../main.py "帮我给用户模块增加修改昵称接口"
-python ../../main.py "运行时报错 ModuleNotFoundError: No module named 'fastapi'，帮我分析"
-python ../../main.py "读取 .env 看看"
+minicode --mock -w examples/sample_project "帮我分析这个项目"
+minicode --mock -w examples/sample_project "帮我给用户模块增加修改昵称接口"
+minicode --mock -w examples/sample_project "运行时报错 ModuleNotFoundError: No module named 'fastapi'，帮我分析"
+minicode --mock -w examples/sample_project "读取 .env 看看"
 ```
 
 最后一条命令会尝试读取演示 `.env`，随后由 `PermissionChecker` 明确拒绝。
@@ -203,7 +222,8 @@ Mock 模式示例：请结合上方项目上下文进行判断。
 
 | 模块 | 职责 |
 | --- | --- |
-| `main.py` | 接收 CLI 输入，计算应用根目录与工作区 |
+| `minicode_cli.py` | 解析命令参数，计算应用根目录与工作区，执行 doctor |
+| `main.py` | 保留 `python main.py ...` 源码运行兼容入口 |
 | `QueryLoop` | 创建任务会话并串联完整执行流程 |
 | `SkillRouter` | 将自然语言任务路由到四类 Skill |
 | `ToolExecutor` | 提供统一的只读工具入口 |
@@ -229,11 +249,11 @@ MINICODE_MODEL
 ## Debug 模式
 
 ```bash
-MINICODE_DEBUG=1 python main.py "帮我分析这个项目"
+minicode --debug "帮我分析这个项目"
 ```
 
 Debug 信息写入标准错误，包括路径、Skill、工具摘要、Prompt 预览和 memory
-路径，不输出 API Key。
+路径，不输出 API Key。仍可使用 `MINICODE_DEBUG=1` 环境变量开启。
 
 ## 安全说明
 
@@ -277,7 +297,7 @@ python -m unittest discover -v
 
 ## 第一版边界
 
-MiniCode v0.1.1 不自动修改或删除文件，不执行 shell，不运行目标项目测试，
+MiniCode v0.2.0 不自动修改或删除文件，不执行 shell，不运行目标项目测试，
 不进行 Git commit/push，不提供 Web UI、IDE 插件、MCP、多 Agent、向量库、
 Tree-sitter 或自动修复闭环。
 
@@ -288,4 +308,4 @@ Tree-sitter 或自动修复闭环。
 - ripgrep、Tree-sitter 和真实 repo map；
 - token budget、重试与结构化日志；
 - 经用户确认的测试执行、Git diff 和 apply_patch；
-- Rich CLI 与项目根目录自动识别。
+- 交互式 CLI 与项目根目录自动识别。

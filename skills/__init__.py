@@ -1,0 +1,1 @@
+"""Bundled MiniCode skill configuration."""
