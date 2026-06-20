@@ -1,0 +1,30 @@
+[
+  {
+    "name": "explain_project",
+    "description": "分析项目结构、技术栈和启动方式",
+    "keywords": ["分析", "项目", "结构", "目录", "启动", "技术栈", "看一下"],
+    "tools": ["list_files", "read_file"],
+    "output_schema": ["项目用途", "技术栈", "目录结构", "启动方式", "建议阅读顺序"]
+  },
+  {
+    "name": "fix_error",
+    "description": "分析运行、构建或测试报错",
+    "keywords": ["报错", "错误", "error", "exception", "failed", "traceback", "失败", "ModuleNotFoundError"],
+    "tools": ["search_code", "read_file", "list_files"],
+    "output_schema": ["错误类型", "可能原因", "相关文件", "修复建议"]
+  },
+  {
+    "name": "small_feature_plan",
+    "description": "生成小功能实现计划",
+    "keywords": ["新增", "增加", "添加", "接口", "功能", "页面", "分页", "搜索", "模块"],
+    "tools": ["search_code", "read_file"],
+    "output_schema": ["任务理解", "可能涉及文件", "实现步骤", "测试建议", "风险点"]
+  },
+  {
+    "name": "patch_suggestion",
+    "description": "针对指定文件生成局部 Patch 建议",
+    "keywords": ["patch", "diff", "改这个文件", "修这个函数", "改成", "给出 patch"],
+    "tools": ["read_file", "search_code"],
+    "output_schema": ["修改原因", "Patch 建议", "影响范围", "注意事项"]
+  }
+]
