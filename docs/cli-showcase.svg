@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="760" viewBox="0 0 1400 760">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d1117"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000" flood-opacity=".35"/>
+    </filter>
+    <style>
+      .title { font: 700 30px Inter, Arial, sans-serif; fill: #f0f6fc; }
+      .subtitle { font: 16px Inter, Arial, sans-serif; fill: #8b949e; }
+      .label { font: 700 17px Inter, Arial, sans-serif; fill: #f0f6fc; }
+      .mono { font: 15px Consolas, "Courier New", monospace; fill: #c9d1d9; }
+      .prompt { font: 700 15px Consolas, "Courier New", monospace; fill: #7ee787; }
+      .info { font: 15px Consolas, "Courier New", monospace; fill: #79c0ff; }
+      .warn { font: 15px Consolas, "Courier New", monospace; fill: #ffa657; }
+      .panel { fill: #161b22; stroke: #30363d; stroke-width: 1.5; filter: url(#shadow); }
+    </style>
+  </defs>
+
+  <rect width="1400" height="760" rx="24" fill="url(#bg)"/>
+  <text x="54" y="58" class="title">MiniCode v0.2.1 — CLI Showcase</text>
+  <text x="54" y="88" class="subtitle">Installable command · environment diagnosis · read-only safety boundary</text>
+
+  <rect x="52" y="122" width="620" height="270" rx="16" class="panel"/>
+  <circle cx="78" cy="148" r="7" fill="#ff7b72"/>
+  <circle cx="100" cy="148" r="7" fill="#f2cc60"/>
+  <circle cx="122" cy="148" r="7" fill="#7ee787"/>
+  <text x="148" y="154" class="label">Command help</text>
+  <text x="76" y="192" class="prompt">$ minicode --help</text>
+  <text x="76" y="224" class="mono">usage: minicode [-h] [-w WORKSPACE] [--debug] [--mock]</text>
+  <text x="76" y="252" class="mono">                [--version] [query ...]</text>
+  <text x="76" y="294" class="info">-w, --workspace   target project directory</text>
+  <text x="76" y="322" class="info">--debug            safe diagnostics to stderr</text>
+  <text x="76" y="350" class="info">--mock             deterministic local demo</text>
+
+  <rect x="700" y="122" width="648" height="270" rx="16" class="panel"/>
+  <circle cx="726" cy="148" r="7" fill="#ff7b72"/>
+  <circle cx="748" cy="148" r="7" fill="#f2cc60"/>
+  <circle cx="770" cy="148" r="7" fill="#7ee787"/>
+  <text x="796" y="154" class="label">Doctor</text>
+  <text x="724" y="192" class="prompt">$ minicode doctor -w examples/sample_project</text>
+  <text x="724" y="224" class="mono">MiniCode doctor</text>
+  <text x="724" y="252" class="mono">Python: 3.10+</text>
+  <text x="724" y="280" class="mono">app_root: &lt;repo&gt;</text>
+  <text x="724" y="308" class="mono">workspace: &lt;repo&gt;/examples/sample_project</text>
+  <text x="724" y="336" class="info">skills.json: found · LLM mode: mock / real</text>
+
+  <rect x="52" y="424" width="1296" height="278" rx="16" class="panel"/>
+  <circle cx="78" cy="450" r="7" fill="#ff7b72"/>
+  <circle cx="100" cy="450" r="7" fill="#f2cc60"/>
+  <circle cx="122" cy="450" r="7" fill="#7ee787"/>
+  <text x="148" y="456" class="label">Sensitive-file denial</text>
+  <text x="76" y="496" class="prompt">$ minicode --mock -w examples/sample_project "读取 .env 看看"</text>
+  <text x="76" y="536" class="mono">【执行过程】</text>
+  <text x="76" y="566" class="warn">- read_file(".env") failed: 禁止读取敏感文件：.env</text>
+  <text x="76" y="612" class="mono">【风险检查】</text>
+  <text x="76" y="642" class="warn">检测到被拒绝的访问：.env</text>
+  <text x="76" y="674" class="info">The CLI entry changed; the read-only permission boundary did not.</text>
+</svg>
