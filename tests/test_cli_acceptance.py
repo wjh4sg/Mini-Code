@@ -121,3 +121,32 @@ class CLIAcceptanceTests(unittest.TestCase):
         self.assertTrue(demo.is_file())
         self.assertIn("MiniCode", demo.read_text(encoding="utf-8"))
         self.assertTrue(license_path.is_file())
+
+    def test_interview_evidence_pack_is_complete(self):
+        readme = (self.root / "README.md").read_text(encoding="utf-8")
+        architecture = self.root / "docs" / "architecture.svg"
+        spec = self.root / "docs" / "spec-v0.1.1.md"
+
+        self.assertIn("## Demo 输出示例", readme)
+        for heading in (
+            "### Demo 1：项目分析",
+            "### Demo 2：小功能计划",
+            "### Demo 3：报错分析",
+            "### Demo 4：权限拒绝",
+        ):
+            self.assertIn(heading, readme)
+        for skill in (
+            "explain_project",
+            "small_feature_plan",
+            "fix_error",
+            "patch_suggestion",
+        ):
+            self.assertIn(skill, readme)
+        self.assertIn("docs/architecture.svg", readme)
+        self.assertTrue(architecture.is_file())
+        self.assertIn("app_root", architecture.read_text(encoding="utf-8"))
+        self.assertIn("workspace", architecture.read_text(encoding="utf-8"))
+        self.assertTrue(spec.is_file())
+        spec_text = spec.read_text(encoding="utf-8")
+        self.assertIn("# MiniCode MVP SPEC v0.1.1", spec_text)
+        self.assertIn("# 37. 最终一句话总结", spec_text)
