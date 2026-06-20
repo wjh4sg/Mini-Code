@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "minicode-agent"
+version = "0.2.0"
+description = "A controlled local CLI coding agent MVP"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+    { name = "WJH4SG" },
+]
+keywords = ["agent", "cli", "coding-agent", "developer-tools"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/wjh4sg/Mini-Code"
+Repository = "https://github.com/wjh4sg/Mini-Code"
+Issues = "https://github.com/wjh4sg/Mini-Code/issues"
+
+[project.scripts]
+minicode = "minicode_cli:main"
+
+[tool.setuptools]
+py-modules = ["minicode_cli", "main"]
+packages = ["agent", "memory", "safety", "skills", "tools"]
+
+[tool.setuptools.package-data]
+skills = ["skills.json"]
