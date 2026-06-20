@@ -1,7 +1,17 @@
 # MiniCode
 
+[![Tests](https://github.com/wjh4sg/Mini-Code/actions/workflows/tests.yml/badge.svg)](https://github.com/wjh4sg/Mini-Code/actions/workflows/tests.yml)
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
+[![Release](https://img.shields.io/github/v/release/wjh4sg/Mini-Code)](https://github.com/wjh4sg/Mini-Code/releases)
+[![License](https://img.shields.io/badge/License-MIT-2ea44f.svg)](LICENSE)
+
 MiniCode v0.1.1 是一个本地 CLI Coding Agent MVP。
 第一版只输出分析、计划和 Patch 建议，不自动修改文件。
+
+![MiniCode 安全访问演示](docs/demo.svg)
+
+> 关键词：确定性 Skill 路由、只读工具调用、路径安全边界、上下文压缩、
+> OpenAI-compatible API、失败降级、可追踪任务记忆。
 
 ## 项目背景
 
@@ -17,7 +27,8 @@ MiniCode v0.1.1 是一个本地 CLI Coding Agent MVP。
 - Patch 建议：读取明确目标文件并给出文本 Patch，不写入文件。
 - 权限审查：拒绝敏感文件、私钥和工作区外路径。
 - Mock/真实模型：没有密钥也能演示，模型失败自动降级。
-- 任务记忆：将任务类型、相关文件和经验保存到 `data/memory.json`。
+- 任务记忆：运行时将任务类型、相关文件和经验保存到
+  `data/memory.json`；仓库提供 `data/memory.example.json` 作为结构示例。
 
 ## 核心执行流程
 
@@ -52,8 +63,8 @@ tests/       unittest 测试
 运行环境为 Python 3.10+。MiniCode 自身只使用标准库，无需安装依赖：
 
 ```bash
-git clone <repository-url>
-cd minicode
+git clone https://github.com/wjh4sg/Mini-Code.git
+cd Mini-Code
 python --version
 ```
 
@@ -143,7 +154,24 @@ python -m unittest discover -v
 ```
 
 测试覆盖路由优先级、文件边界、敏感数据、工具、Prompt 压缩、模型降级、
-记忆恢复和四条 CLI Demo。
+记忆恢复和四条 CLI Demo。GitHub Actions 在 Python 3.10、3.11、3.12
+上执行同一套检查。
+
+## 面试讲解要点
+
+如果面试官问“这个项目难点在哪里”，可以从下面四点展开：
+
+1. **Agent 不是一次模型调用**：MiniCode 把自然语言路由、工具调用、上下文
+   构建、模型输出、格式化和记忆串成可追踪执行链路。
+2. **安全边界在工具层统一实现**：`read_file` 和 `search_code` 都必须经过
+   `PermissionChecker`，并对路径穿越和符号链接使用解析后的真实路径判断。
+3. **路径模型明确分离**：`app_root` 保存配置和 memory，`workspace` 只代表
+   被分析项目，避免 Demo 从子目录运行时读写错位。
+4. **演示稳定性优先**：无 API Key 时使用确定性 Mock，真实模型网络或响应
+   异常时自动降级，同时仍保留执行过程和风险检查。
+
+当前 MVP 有意不做代码写入和 shell 执行。下一阶段若增加 `apply_patch`，
+会要求用户确认、diff 预览和回滚机制，而不是直接扩大权限。
 
 ## 第一版边界
 

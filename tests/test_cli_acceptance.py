@@ -10,14 +10,20 @@ class CLIAcceptanceTests(unittest.TestCase):
         self.root = Path(__file__).resolve().parents[1]
         self.workspace = self.root / "examples" / "sample_project"
         self.memory_path = self.root / "data" / "memory.json"
-        self.original_memory = self.memory_path.read_bytes()
+        self.memory_existed = self.memory_path.exists()
+        self.original_memory = (
+            self.memory_path.read_bytes() if self.memory_existed else None
+        )
         self.env = os.environ.copy()
         self.env["PYTHONIOENCODING"] = "utf-8"
         for name in ("MINICODE_API_KEY", "MINICODE_BASE_URL", "MINICODE_MODEL"):
             self.env.pop(name, None)
 
     def tearDown(self):
-        self.memory_path.write_bytes(self.original_memory)
+        if self.memory_existed:
+            self.memory_path.write_bytes(self.original_memory)
+        elif self.memory_path.exists():
+            self.memory_path.unlink()
 
     def run_cli(self, query):
         return subprocess.run(
@@ -74,3 +80,44 @@ class CLIAcceptanceTests(unittest.TestCase):
         for text in required:
             with self.subTest(text=text):
                 self.assertIn(text, readme)
+
+    def test_runtime_memory_is_ignored_and_example_is_committed(self):
+        ignored = subprocess.run(
+            ["git", "check-ignore", "data/memory.json"],
+            cwd=self.root,
+            capture_output=True,
+            text=True,
+        )
+        tracked = subprocess.run(
+            ["git", "ls-files", "data/memory.json"],
+            cwd=self.root,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+        self.assertEqual(ignored.returncode, 0)
+        self.assertEqual(tracked.stdout.strip(), "")
+        example = self.root / "data" / "memory.example.json"
+        self.assertEqual(example.read_text(encoding="utf-8").strip(), "[]")
+
+    def test_repository_presentation_assets_are_complete(self):
+        readme = (self.root / "README.md").read_text(encoding="utf-8")
+        workflow = self.root / ".github" / "workflows" / "tests.yml"
+        demo = self.root / "docs" / "demo.svg"
+        license_path = self.root / "LICENSE"
+
+        self.assertNotIn("<repository-url>", readme)
+        self.assertIn("https://github.com/wjh4sg/Mini-Code.git", readme)
+        self.assertIn("actions/workflows/tests.yml/badge.svg", readme)
+        self.assertIn("docs/demo.svg", readme)
+        self.assertIn("面试讲解要点", readme)
+        self.assertTrue(workflow.is_file())
+        workflow_text = workflow.read_text(encoding="utf-8")
+        for version in ("3.10", "3.11", "3.12"):
+            self.assertIn(version, workflow_text)
+        self.assertIn("python -m compileall -q .", workflow_text)
+        self.assertIn("python -m unittest discover -v", workflow_text)
+        self.assertTrue(demo.is_file())
+        self.assertIn("MiniCode", demo.read_text(encoding="utf-8"))
+        self.assertTrue(license_path.is_file())
